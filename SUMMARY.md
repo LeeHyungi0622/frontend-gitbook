@@ -41,5 +41,4 @@
 
 ## 회고
 
-- [회고]
-  - [1주차 회고](1st_week_review.md)
+- [1주차 회고](1st_week_review.md)
