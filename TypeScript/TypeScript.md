@@ -1,46 +1,29 @@
----
-description: 1주차 3일 스터디 (2024/05/21)
----
+### (참고) TypeScript 공식 사이트
+- https://www.typescriptlang.org/ko/docs/handbook/intro.html
 
-### Parcel의 암묵적 처리
-    - package.json의 source: "index.html"파일을 Parcel을 사용해서 start를 해주게 되면, 아래와 같이 Parcel이 script 태그를 넣어준다. 
-        
-    ```html
-    <body>
-        <script src="/my-project.3464ddca.js"></script>
-    </body>
-    ```
-
-    ```html
-    <body>
-        <p>Hello Hyungi</p>
-        <!-- bundler를 썼기 때문에 parcel이 한 번 변환을 해준다. -->
-        <script type="module" src="./src/main.tsx"></script>
-    </body>
-    ```
 
 ### TypeScript
 
-```typescript
-let name: string;
-let age: number;
+    ```typescript
+    let name: string;
+    let age: number;
 
-name = '이현기';
-age = 13;
+    name = '이현기';
+    age = 13;
 
-// 아래 두 값 대입에서 에러 발생
-name = 13;
-age = '이현기';
+    // 아래 두 값 대입에서 에러 발생
+    name = 13;
+    age = '이현기';
 
-let human: {
-    name: string,
-    age: number
-}
+    let human: {
+        name: string,
+        age: number
+    }
 
-human = {name: '이현기', age: 35}
-```
+    human = {name: '이현기', age: 35}
+    ```
 
-#### 타입 정의하기 (Defining Types)
+    #### 타입 정의하기 (Defining Types)
 
 ```typescript
 type Human = {
@@ -192,6 +175,3 @@ function identity<Type>(arg: Type): Type {
     return arg;
 }
 ```
-
-다양한 방식으로 React 실습해보기
-

@@ -1,42 +1,14 @@
----
-description: 1주차 1일 스터디 (2024/05/20)
----
+### Linter(린터)
+소스코드를 분석하여 프로그램 오류, 버그, 스타일 오류를 분석해주는 정적 분석 (소스코드로 분석)
 
-### 프론트엔드 개발 환경
+#### ESLint 설정하기
 
-- Deno(데노 -> 디노)를 쓰면 훨씬 간단하게 개발환경을 셋팅할 수 있지만, 대부분 Node.js를 기반으로 하기 때문에 상대적으로 어렵다.
+```zsh
+npm init @eslint/config
+```
+위 명령을 통해 eslint.config.js 파일 (or eslint.config.mjs) 파일을 생성하고 lint를 실행한다.
 
-- 전체적인 흐름을 파악하고 앞으로 개발환경이 바뀌면 그에 맞춰 대응할 수 있도록 하는 능력을 키우는 것이 중요하다.
-
-- 기존 nvm(Node Version Manager) 보다 fnm(Fast Node Manager)를 사용한다. 
-
-- [FNM](https://github.com/Schniz/fnm)
-
-- LTS(Long Term Support)
-
-## TypeScript + React + Jest + Parcel
-
-### .nvmrc 파일 생성을 통한 사용 버전 기록
-
-### package 설치시 devDependency와 dependency
-
-- 프로그램에서 직접 사용 (dependency)
-
-- 개발환경에서 도구로써 설치 (devDependency)
- - 실제 서버에 배포시에는 devDependency를 제외함으로써 용량을 줄인다.
- - 악의적인 공격에 의해서 개발 도구를 실행하는 것을 미연에 방지한다.
-
- ### npx tsc
- - package를 설치 안했어도 npm package를 땨로 캐싱해서 관리하는 곳으로 받아서 실행한다. (직접 설치하지 않아도 된다. 기존에는 npm i -g를 통해 직접설치해서 사용했지만 이젠 안해도 됨)
-
- ### Bundler
- - esmodule처럼 사용
- - 실제로 esmodule을 브라우저가 지원하기 때문에 쓸 수 있지만, 우리는 Parcel이라는 도구를 써서 번들링해서 쓸 것이기 때문에 직접적으로 브라우저의 기능을 사용하지는 않을 것이다.
- - Vite(비트) 같은 도구를 쓰면, es-module을 적극적으로 사용하기도 한다. 하지만 번들러를 써서 하나의 파일을 만들어서 사용하는 경우에는 사용하지 않는다.
-
-
-
-## 질문 목록 OR 추가적으로 공부할 내용
+#### VSCode에서 ESLint extension 설치하기
 
 ### .eslintrc.js와 eslint.config.mjs 파일의 차이에 대해 학습하기
 - ESLint 설정에서 질문이 있는데, 강의에서 npx eslint --init을 하게 되면, .eslintrc.js 파일이 생성이 되는데, eslint.config.mjs가 생성이 됨
@@ -161,18 +133,4 @@ description: 1주차 1일 스터디 (2024/05/20)
         ```
 
 
-### SWC[?] 사용
-- Jest와 SWC를 같이 사용
-
-### 버전 호환 이슈 (Parcel 설치 과정에서 버전호환 이슈 발생)
-- NPM 에러 코드 ERESOLVE는 패키지 종속성 해결 과정에서 충돌이 발생했음을 나타냅니다. 여기서의 문제는 eslint@9.3.0과 eslint-plugin-react@7.34.1이 서로 호환되지 않는다는 것입니다. eslint-plugin-react@7.34.1은 eslint의 버전을 ^3 || ^4 || ^5 || ^6 || ^7 || ^8로 제한하고 있습니다.
-
-  (eslint 버전 선택 부분에 대한 설명이 별도로 없어서 eslint 9로 설치해서 parcel 설치시에 위의 버전 호환 이슈 발생해서 eslint를 버전 8로 내려서 parcel 설치하니깐 해당 이슈 해결)
-
-### Webpack과 Parcel의 차이
-- Parcel은 Webpack 대비 어떤 장점이 있는 친구인지 찾아서 공부하기
-
-
-### (참고) TypeScript 공식 사이트
-- https://www.typescriptlang.org/ko/docs/handbook/intro.html
 
