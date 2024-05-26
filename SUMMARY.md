@@ -6,12 +6,12 @@
 
 ## 개발 환경설정
 
-- [ENV_SETTING](/Env_Settings/)
-  - [기본 개발환경설정](/Env_Settings/BaseDevEnv.md)
-  - [디노와 Node.js](/Env_Settings/Deno_and_NodeJS.md)
-  - [NVM(Node Version Manager)과 FNM(Fast Node Manager)]((/Env_Settings/nvm_and_fnm.md))
-  - [DevDependency와 Dependency의 차이](/Env_Settings/devdependency_and_dependency.md)
-  - [NPX와 번들러](/Env_Settings/npx_and_bundler.md)
+- [ENV_SETTING](/ENV_SETTING/)
+  - [기본 개발환경설정](/ENV_SETTING/BaseDevEnv.md)
+  - [디노와 Node.js](/ENV_SETTING/Deno_and_NodeJS.md)
+  - [NVM(Node Version Manager)과 FNM(Fast Node Manager)]((/ENV_SETTING/nvm_and_fnm.md))
+  - [DevDependency와 Dependency의 차이](/ENV_SETTING/devdependency_and_dependency.md)
+  - [NPX와 번들러](/ENV_SETTING/npx_and_bundler.md)
 
 ## 자바스크립트
 - [JavaScript](/JavaScript/)
