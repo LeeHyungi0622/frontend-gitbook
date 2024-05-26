@@ -41,4 +41,5 @@
 
 ## 회고
 
-- [1st week 데브노트](1st_week_dev_note.md)
+- [회고]
+  - [1주차 회고](1st_week_review.md)
