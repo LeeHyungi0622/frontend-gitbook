@@ -48,3 +48,4 @@
 
 - [회고](/Review/)
   - [1주차 회고](/Review/1st_week_review.md)
+  - [2주차 회고](/Review/2nd_week_review.md)
