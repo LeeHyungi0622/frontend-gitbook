@@ -26,6 +26,7 @@
 
 - [React](/React/)
   - [JSX](/React/JSX.md)
+  - [React로 사고하기](/React/)
 
 ## Linter
 - [Linter](/Linter/)

@@ -1,5 +1,5 @@
 ---
-description: 1주차 회고
+description: 2주차 회고
 ---
 
 ### 2주차 회고
