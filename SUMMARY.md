@@ -29,6 +29,11 @@
   - [React로 사고하기](/React/ThinkInReact.md)
   - [Hooks](/React/Hooks.md)
 
+## External Storage
+
+- [SoC](/External_Store/Introduction.md)
+- [TSyringe](/External_Store/Tsyringe.md)
+
 ## Linter
 - [Linter](/Linter/)
   - [ESLint](/Linter/ESLint.md)
