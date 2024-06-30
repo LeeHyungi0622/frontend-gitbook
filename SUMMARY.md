@@ -31,8 +31,11 @@
 
 ## External Storage
 
+- [왜 External Store에 대해서 학습을 하는가?](/External_Store/Why.md)
 - [SoC](/External_Store/Introduction.md)
 - [TSyringe](/External_Store/Tsyringe.md)
+- [Redux](/External_Store/Redux.md)
+- [usestore-ts](/External_Store/Usestore-ts.md)
 
 ## Linter
 - [Linter](/Linter/)
