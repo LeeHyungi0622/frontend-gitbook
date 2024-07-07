@@ -64,3 +64,4 @@
   - [2주차 회고](/Review/2nd_week_review.md)
   - [3주차 회고](/Review/3rd_week_review.md)
   - [6주차 회고](/Review/6th_week_review.md)
+  - [7주차 회고](/Review/7th_week_review.md)
