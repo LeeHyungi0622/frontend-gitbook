@@ -589,6 +589,216 @@ components 폴더 하위에 따로 tests라는 폴더를 만들거나 그 상위
 
 이는 실제 테스트 코드 작성한 곳에서는 직접 생성한 onChange 정의 method를 주입해주기 때문이다.
 
+`TextField.test.tsx`
+```ts
+import { fireEvent, render, screen } from "@testing-library/react";
+import TextField from "./TextField";
+
+test('TextField', () => {
+    // given
+    const label = 'Search';
+    const text = 'Tester';
+    const placeholder = 'Input your name';
+
+    // 실제로 Input Element를 사용하는 곳에서만 setFilterText()로 정의하고,
+    // 테스트할 때에는 범용적으로 사용되는 이름인 setText()로 정의해서 사용한다.
+    
+    // setText가 불렸는지 테스트
+    let called = false;
+
+    const setText = () => {
+        called = true;
+    };
+    
+    // when
+    render((
+        <TextField 
+            label={label}
+            placeholder={placeholder}
+            text={text}
+            setText={setText}
+        />))
+
+    // then
+    // 지정한 label 텍스트와 연결된 input element가 잡힌다.
+    // 정규표현식으로도 잡아줄 수 있다.
+    screen.getByLabelText(/Sear/);
+
+    const input = screen.getByLabelText(label) as HTMLInputElement;
+    expect(input.value).toBe(text);
+    expect(input.placeholder).toBe(placeholder);
+
+    // 아래와 같이 해주거나 
+    screen.getByDisplayValue(text);
+    // 아래와 같이 해주면 된다.
+    // placeholder 테스트 하기 
+
+
+    // when
+    fireEvent.change(screen.getByLabelText(label), {
+        target: { value: 'New Name' },
+    })
+
+    // then
+    // setText() method가 실행이 되었는지 확인하는 테스트 구문
+    // useState hook을 사용해서 테스트하는 것이 아닌, 
+    // TextField 컴포넌트에 넘겨준 setText() 함수가 실행이 되는지
+    // 테스트를 한다.
+    expect(called).toBeTruthy();
+});
+```
+
+`TextField.tsx`
+
+```ts
+import { useRef } from "react";
+
+type TextFiledProps = {
+    label: string;
+    placeholder: string;
+    text: string;
+    setText: (value: string) => void;
+}
+
+export default function TextField({
+    label, placeholder, text, setText,
+}: TextFiledProps) {
+    const id = useRef(`input-${Math.random()}`);
+    
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        setText(value);
+    };
+
+    return (
+        <div>
+            <label htmlFor={id.current}>
+                { label }
+            </label>
+            <input 
+                type="text" 
+                id={id.current}
+                placeholder={placeholder}
+                value={text}  
+                onChange={handleChange} 
+            />
+        </div>
+    )
+}
+```
+
+테스트코드를 작성하면서, 컴포넌트를 사용하는 코드를 작성하면서 해당 컴포넌트의 인터페이스의 기본적인 부분을 점검할 수 있다!
+
+label에 대한 부분과 text와 같은 범용적인 표현을 사용하지 않은 문제, 이러한 문제들은 테스트부터 작성을 했다면 사전에 문제를 발견해서 수정할 수 있었을 것이다.
+
+나중에 수정해야지.. 이런다면, 시간이 지나면서 해당 코드에 대한 지식이 감소하고, 자신감 또한 감소하기 때문에 건드리기 힘든 코드가 된다!
+
+이제부터라도 테스트 코드부터 작성하면서 좀 더 깊이 있게 컴포넌트를 고려하는 개발을 하도록 하자!!!
+
+### <u>위에서 작성한 `setText()` 메서드가 실행되는지 테스트하는 부분은 아래와 같이 좀 더 간편하게 처리해줄 수 있다.</u>
+
+
+```ts
+// const setText = () => {
+//     called = true;
+// };
+
+// (Case 1) jest.fn()으로 해당 함수가 호출되었는지만 확인
+const setText = jest.fn();
+
+expect(setText).toBeCalled();
+
+
+// (Case 2) 직접 input element에 입력값을 넣어서 입력된 값과 함께
+//          setText() 함수가 같이 호출되었는지 확인
+// when
+fireEvent.change(screen.getByLabelText(label), {
+    target: { value: 'NewName' },
+});
+
+// then
+// setText() method가 실행이 되었는지 확인하는 테스트 구문
+// useState hook을 사용해서 테스트하는 것이 아닌, 
+// TextField 컴포넌트에 넘겨준 setText() 함수가 실행이 되는지
+// 테스트를 한다.
+expect(setText).toBeCalledWith('NewName');
+
+
+// (Case 3) jest.fn()만 선언해도 되지만, 내부적으로 called 변수의
+// 값을 변경함으로써 변경된 변수를 통해 호출 여부를 판단할 수 있다.
+const setText = jest.fn(() => {
+    called = true;
+});
+
+expect(called).toBeTruthy();
+```
+
+### <u>이젠 BDD 스타일로 코드를 바꾸고, 입력 등이 잘 작동하는지 확인!</u>
+
+```tsx
+import { fireEvent, render, screen } from "@testing-library/react";
+import TextField from "./TextField";
+
+const context = describe;
+
+describe('TextField', () => {
+    // given
+    const label = 'Search';
+    const text = 'Tester';
+    const placeholder = 'Input your name';
+
+    // mock한건 아래 두 가지 테스트 케이스에서 모두 실행되기 때문에
+    // 반드시 
+    const setText = jest.fn();
+
+    beforeEach(() => {
+        // 각 테스트 실행할때마다 mocking한 부분을 초기화해준다.
+        // setText.mockClear();
+        // 모든 mocking 변수를 전부 초기화 시켜준다.
+        jest.clearAllMocks();
+    });
+
+    function renderTextField() {
+        render(
+            <TextField 
+                label={label}
+                placeholder={placeholder}
+                text={text}
+                setText={setText}
+            />
+        );
+    }
+
+    it('renders elements', () => {
+        // when
+        renderTextField();
+    
+        // then
+        // 지정한 label 텍스트와 연결된 input element가 잡힌다.
+        // 정규표현식으로도 잡아줄 수 있다.
+        screen.getByLabelText(label);
+        screen.getByPlaceholderText(placeholder);
+        screen.getByDisplayValue(text);
+    });
+    
+    context('when user types name', () => {
+        // given
+        it('calls setText() handler', () => {
+            renderTextField();
+    
+            // when
+            fireEvent.change(screen.getByLabelText(label), {
+                target: { value: 'NewName' },
+            })
+    
+            // then
+            expect(setText).toBeCalledWith('NewName');
+        });
+    });
+});
+
+`React Testing Library 강의 (24:05)`
+```
 
 
 
