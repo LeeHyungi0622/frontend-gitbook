@@ -528,17 +528,16 @@ function add(...numbers: number[]): number {
 `최종 작성한 테스트 코드는 아래와 같다.`
 
 ```js
-function add(numbers: number[] = [0]): number {
-    return numbers.reduce((acc, number) => acc + number, 0);
-}
-
-test('add', () => {
-    expect(add([1, 2])).toBe(3);
-});
-
-const context = describe;
-
 describe('add', () => {
+    // describe 외부에 아래 context와 add() function을 선언하게 되면,
+    // Jest와 같은 테스트 러너는 각 테스트 파일을 별도의 모듈로 로드하지만,
+    // 일부 모듈이나 변수가 캐싱될 수 있고, 이러한 경우에는 특정 변수가
+    // 전역 범위에 정의되면 다른 테스트 파일에서도 접근할 수 있다.
+    const context = describe;
+    
+    function add(numbers: number[] = [0]): number {
+        return numbers.reduce((acc, number) => acc + number, 0);
+    }
     context('with no args', () => {
         it('returns zero', () => {
             expect(add()).toBe(0); 
@@ -564,8 +563,34 @@ describe('add', () => {
 
 <br/>
 
+## RTL(React Testing Library)
+
+React DOM을 테스팅하기 쉽게 할 수 있게 나온 것이다.
+
+Jest가 돌아가는 Node환경에서 document 객체를 사용해서 테스트를 할 수 있도록 해준다.
+
+하지만, 브라우저상에서는 돌아가는 테스트가 아니기 때문에 E2E 테스트는 아니다.
 
 # (STEP 2) 각 각의 컴포넌트들을 작성 할 때 작성하는 단위 테스트 코드
+
+`TextField 컴포넌트에 대해서 테스트 (사용자 입장에서 어떻게 되는지 잘 드러나는 케이스)`
+
+components 폴더 하위에 따로 tests라는 폴더를 만들거나 그 상위 위치에 `__Tests`폴더를 만들어서 테스트용 파일을 생성할 수 있다.
+
+하지만, 가장 좋은 방법은 테스트하고자 하는 파일과 같은 경로나 같은 경로에 tests 폴더를 만들어서 테스트 코드 작성을 위한 파일을 만드는 것이 좋다.
+
+`src/components/TextField.tsx`와 동일한 경로에 `src/components/TextField.test.tsx`를 만든다.
+
+```js
+
+```
+
+테스트 하고자 하는 컴포넌트인 `<TextField />`컴포넌트에서 handleChange() event method에 컴파일 에러가 발생해도 테스트 코드가 통과되는 것을 볼 수 있다.
+
+이는 실제 테스트 코드 작성한 곳에서는 직접 생성한 onChange 정의 method를 주입해주기 때문이다.
+
+
+
 
 # (STEP 3) E2E 테스트 코드
 
