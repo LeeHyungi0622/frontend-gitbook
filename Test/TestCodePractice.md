@@ -283,3 +283,289 @@ describe('App', () => {
 });
 ```
 
+# (중요!) 테스트 코드 작성하기 전 준비
+
+add(x, y)와 같이 더하더가 하는 로직적인 부분을 interface(인터페이스)로 정의한다.
+
+따라서 테스트 코드를 먼저 작성하는, 즉 구현보다는 인터페이스와 스펙을 먼저 정의함으로써 개발을 진행하는 방식이다.
+
+- Red 
+
+실패하는 테스트 코드를 작성한다. (인터페이스와 스펙에 집중)
+
+- Green
+
+재빨리 테스트를 통과시킨다. 죄악을 저질러도 괜찮다.
+
+- Refactor
+
+리팩터링을 통해 코드를 올바르게 만든다. (동작은 바꾸지 않고 코드를 바꾼다)
+
+TDD에서 가장 중요한 부분이지만, 간과될 때가 많다.
+
+1~10분 이내로 한 사이클 돌릴 수 있는 작은 단위를 찾아서 테스트 코드를 작성하고, Green 단계로 넘어간다. 
+
+단, 만약에 Green 단계에서 테스트 코드를 작성하는 것이 어려운 경우에는 Red로 돌아가서 더 작고 쉬운 문제를 정의하고, Refactor 단계를 위해 의도를 드러내고 중복을 찾아서 제거하는 연습이 필요하다. 
+
+`단순 TDD에 국한된 문제가 아니라 개발 자체에서 매우 중요한 한 부분으로, 전체 개발을 큰 하나의 부분으로 봤을 때 각 각의 작은 개발단위로 나눠서 이해하고 파악하는 것이 중요하다.`
+
+`TDD FAQ` : [https://megaptera.notion.site/TDD-FAQ-edcaa36e8cf246d9a2aa546d99810202](https://megaptera.notion.site/TDD-FAQ-edcaa36e8cf246d9a2aa546d99810202)
+
+`Jest를 이용한 간단한 TDD 예제` : [https://megaptera.notion.site/Jest-TDD-4149c9f23b2d4402ad44d4d569a3ae13](https://megaptera.notion.site/Jest-TDD-4149c9f23b2d4402ad44d4d569a3ae13)
+
+## 도구를 사용하기 위한 학습
+
+Facebook에서 만든 테스팅 도구인 `Jest`가 있다.
+
+### <u>테스트 코드 파일 확장자</u>
+App.spec.ts (`BDD 스타일의 테스트 코드 작성시 spec으로 네이밍 / 하지만 test.ts로 통일해서 사용해도 무방`)
+
+### <u>테스트 코드 작성 방식 1 (Given-When-Then)</u>
+어떤 상황인지 명확하게 파악할 수 있는 방식이다.
+
+```
+Given - 700와트 전자렌지를 준비하고, 3분이란 시간이 주어졌을 때
+When - 주어진 시간동안 전자렌지를 돌리면
+Then - 요리가 완성된다.
+```
+
+### <u>테스트 코드 작성 방식 2 (Describe-Context-it)</u>
+BDD 스타일로 테스트 코드를 작성할때 사용하는 방식이다.
+
+```
+Describe - 
+Context - 
+it - 
+```
+
+`(테스팅 도구들의 관계)`
+
+RSpec(Ruby로 작성) -> `(영향)` -> Mocha -> `(영향)` -> Jest
+
+테스트 케이스를 정의할 때 크게 두 가지 방법을 사용한다.
+
+1. test 함수로 개별 테스트를 나열하는 방식으로 테스트 코드를 작성한다.
+
+2. BDD 스타일로 주체-행위 중심으로 테스트를 조직화하는 방식으로 테스트 코드를 작성한다.
+
+`(1번 test 함수로 개별 테스트 나열방식으로 테스트 코드 작성 예시)`
+
+(STEP 1) `Red 단계` add() 함수가 정의되어 있지 않기 때문에 에러가 발생한다.
+```js
+test('add', () => {
+    expect(add(1, 2)).tobe(3);
+})
+```
+
+(STEP 2) `Green 단계` 무조건적으로 숫자 3을 반환하는 add() 함수를 작성해준다. 
+(빠르게 통과되는 테스트 코드 작성)
+
+```js
+function add(x: number, y: number): number {
+    return 3;
+}
+```
+
+만약에 *.test.ts 파일에서 작성한 테스트 코드를 js코드로 인식해서 에러가 발생한다면, `jest.config.js`파일을 추가해서 타입스크립트를 작성할 수 있도록 한다.
+
+<br/>
+
+`jest.config.js`
+
+```js
+module.exports = {
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: [
+    '@testing-library/jest-dom/extend-expect',
+  ],
+  transform: {
+    '^.+\\.(t|j)sx?$': ['@swc/jest', {
+      jsc: {
+        parser: {
+          syntax: 'typescript',
+          jsx: true,
+          decorators: true,
+        },
+        transform: {
+          react: {
+            runtime: 'automatic',
+          },
+        },
+      },
+    }],
+  },
+};
+```
+
+프론트 개발할 때에는 별도의 외부 터미널 애플리케이션에서 `npx jest --watchAll` 명령 실행을 통해 실시간으로 프로젝트 내 작성한 테스트 코드가 통과되는지 확인해가면서 개발을 진행하도록 해보자!
+
+<br/>
+
+(STEP 3) `Refactor 단계` 의도(인자로 넘겨받은 x와 y를 가지고 더한값을 반환하도록 한다)를 드러내는 형태로 add() 함수를 작성한다.
+
+```zsh
+function add(x: number, y: number): number {
+    return x + y;
+}
+```
+
+위에서 작성한 test()함수를 활용한 테스트 코드 내용을 `BDD 방식`으로 작성해보도록 한다.
+
+우선적으로 테스트 코드는 아래와 같이 작성한다.
+
+아래 코드에서 기존 `1 + 2`에서 `x + y`로 바꾸고, 만약에 인자로 복수 개 인자가 들어오는 경우, 아래와 같이 number[] 타입의 numbers 인자를 넘겨 받아서 더하는 형태로 코드를 계속 작성한다. 
+
+코드 작성하는 중간 과정에서는 아래와 같이 `(numbers[numbers.length - x]) + ...` 형태로 반복이 되고 있음을 확인할 수 있다.
+
+따라서 이 반복 코드를 어떻게 수정해줄지에 대해서는 그 다음 코드블럭에서 작성을 해보도록 한다.
+
+
+```js
+function add(...numbers: number[]): number {
+    return (numbers[numbers.length - 2] ?? 0) + (numbers[numbers.length - 1] ?? 0);
+}
+
+test('add', () => {
+    expect(add(1, 2)).toBe(3);
+});
+
+const context = describe;
+
+describe('add', () => {
+    context('with two numbers', () => {
+        it('returns sum of two numbers', () => {
+            expect(add(1, 2)).toBe(3);
+        });
+    });
+    context('with only one args', () => {
+        it('returns the same number', () => {
+            expect(add(2)).toBe(2); 
+        });
+    });
+    context('with no args', () => {
+        it('returns zero', () => {
+            expect(add()).toBe(0); 
+        });
+    });
+})
+
+
+```
+<br/>
+
+반복 코드를 아래와 같이 또 다른 형태로 코드를 작성해준다.
+
+```js
+function add(...numbers: number[]): number {
+    if (numbers.length === 0) {
+        return 0;
+    }
+
+    if (numbers.length === 1) {
+        return numbers[0];
+    }
+
+    if (numbers.length === 2) {
+        return numbers[0] + numbers[1];
+    }
+
+    if (numbers.length === 3) {
+        return add(numbers[0], numbers[1]) + numbers[2]; 
+    }
+
+    return (numbers[numbers.length - 2] ?? 0) + (numbers[numbers.length - 1] ?? 0);
+}
+```
+
+다음 단계를 통해 좀 더 패턴화를 간략화 할 수 있다.
+
+```js
+function add(...numbers: number[]): number {
+    if (numbers.length === 0) {
+        return 0;
+    }
+
+    if (numbers.length === 1) {
+        return numbers[0];
+    }
+
+    if (numbers.length === 2) {
+        return numbers[0] + numbers[1];
+    }
+
+    if (numbers.length === 3) {
+        // slice() 함수를 사용해서 0부터 numbers.length - 2 index 값까지의 합을 재귀형태로 호출
+        return add(...numbers.slice(0, numbers.length -1)) + numbers[numbers.length - 1]; 
+    }
+
+    return (numbers[numbers.length - 2] ?? 0) + (numbers[numbers.length - 1] ?? 0);
+}
+```
+
+위 코드를 더 간략하게 하면, 아래와 같이 최종적으로 피보나치 수열의 형태로 코드를 간략하게 수식화해서 작성할 수 있다.
+
+```js
+function add(...numbers: number[]): number {
+    if (numbers.length === 0) {
+        return 0;
+    }
+
+    return add(...numbers.slice(0, numbers.length -1)) + numbers[numbers.length - 1]
+}
+```
+
+위의 코드로 재귀함수를 구현한 것을 `reduce()`함수를 사용해서 더 간단하게 작성할 수 있다.
+
+```js
+// reduce 함수의 초기값을 0으로 주었기 때문에 인자로 받은 numbers length가 0없는 경우에는 initial value로 설정한 0이 반환되어 아래와 같이 작성할 수 있다. 
+function add(...numbers: number[]): number {
+    return numbers.reduce((acc, number) => acc + number, 0);
+}
+```
+
+위와 같은 코드 리팩토링이 안정적으로 가능했던 것은, 테스트 코드를 기반으로 로직을 수정하면서 로직 자체가 깨지지 않는지 확인할 수 있었기 때문이다.
+
+`최종 작성한 테스트 코드는 아래와 같다.`
+
+```js
+function add(numbers: number[] = [0]): number {
+    return numbers.reduce((acc, number) => acc + number, 0);
+}
+
+test('add', () => {
+    expect(add([1, 2])).toBe(3);
+});
+
+const context = describe;
+
+describe('add', () => {
+    context('with no args', () => {
+        it('returns zero', () => {
+            expect(add()).toBe(0); 
+        });
+    });
+    context('with only one args', () => {
+        it('returns the same number', () => {
+            expect(add([2])).toBe(2); 
+        });
+    });
+    context('with two numbers', () => {
+        it('returns sum of two numbers', () => {
+            expect(add([1, 2])).toBe(3);
+        });
+    });
+    context('with many numbers', () => {
+        it('returns zero', () => {
+            expect(add([1, 2, 3, 4, 5, 6, 7])).toBe(28); 
+        });
+    });
+})
+```
+
+<br/>
+
+
+# (STEP 2) 각 각의 컴포넌트들을 작성 할 때 작성하는 단위 테스트 코드
+
+# (STEP 3) E2E 테스트 코드
+
