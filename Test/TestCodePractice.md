@@ -756,6 +756,7 @@ describe('TextField', () => {
         // setText.mockClear();
         // 모든 mocking 변수를 전부 초기화 시켜준다.
         jest.clearAllMocks();
+        // 위 둘 중에 하나만 작성해주면,mocking한 모든 변수에 대해서 초기화를 시켜준다.
     });
 
     function renderTextField() {
@@ -800,7 +801,132 @@ describe('TextField', () => {
 `React Testing Library 강의 (24:05)`
 ```
 
+beforeEach 함수를 통해 `given`으로 주어진 변수들을 상이한 값으로 선언해서 여러 케이스로 나누어 
+테스트 진행 
 
+```js
+beforeEach(() => {
+    // 이 영역에 given으로 주어진 text, placeholder 등의 변수들을
+    // 상위 scope에서는 let으로 선언을 해주고,
+    // 여기서 각기 다른 변수값을 선언해서 테스트를 다르게 진행해줄 수 있다.
+})
+```
 
+`given`(테스트를 하기위해 기본적으로 주어지는 조건) 영역은 기본적으로, context와 it 영역 사이에 
+beforeEach() 함수를 두고 해당 영역에 given에서 주어진 기본 영역값을 선언한다.
+
+```ts
+context('when user types name', () => {
+    beforeEach(() => {
+        // given
+        renderTextField();
+    });
+    it('calls setText() handler', () => {
+        // when
+        fireEvent.change(screen.getByLabelText(label), {
+            target: { value: 'NewName' },
+        });
+        // then
+        expect(setText).toBeCalledWith('NewName');
+    });
+});
+```
+<br/>
+
+`BDD Test code format`
+```tsx
+// ~한 경우에
+context('[상황에 대해 명시]', () => {
+    beforeEach(() => {
+        // given
+        // [이것들이 주어지면]
+    })
+    it('[context에서 정의한 행동을 하면, 따라오는 그 다음 행동]', () => {
+        // when
+        // 이런 것들을 해주는 경우에는
+
+        // then
+        // 이런 결과를 확인할 수 있다.
+    })
+})
+```
+
+만약에 fireEvent.change() method를 별도의 function으로 빼고 싶은 경우에는 아래와 같이 
+별도의 함수를 describe 함수 하위에 선언해서 재사용성을 높여도 괜찮다.
+
+```tsx
+function inputText(value: string) {
+    fireEvent.change(screen.getByLabelText(label), {
+        target: { value },
+    });
+}
+```
+
+명시적으로 드러내고 싶은경우에는 별도의 함수로 빼지 않아도 된다.
+
+숫자만 입력받는 Input element에 대한 테스트
+
+swc가 타입 붙어있는것들을 모두 제거하고, 테스트 코드를 돌린다.
+
+타입에 대한 검증을 하려면, 아래와 같이 typescript compiler를 `--noEmit`옵션을 붙여서 작성을 해준다.
+
+```zsh
+# 컴파일한 결과가 js파일로 생성되지 않게 처리한다.
+npx tsc --noEmit
+```
+
+아래와 같이 하면,`npm run check`명령을 통해서 잘못 작성된 부분에 대해서 확인을 할 수 있다.
+```
+npm run lint
+npm run check
+```
+
+### 외부 서버에 대한 요청을 통해 받은 결과값을 화면에 뿌려주는 경우에는 서버에 요청을 보내서 값을 가져오는 별도의 hook을 사용해서 값을 정의하게 되는데, 아래와 같이 mocking을 해서 임의로 반환되는 값을 정의할 수 있다.
+
+```tsx
+import { render, screen } from "@testing-library/react"
+import App from "./App"
+
+// useFetch module을 작성해준다.
+// 아래와 같이 useFetchData() hook을 mocking해서 반환값을 문자열 ㅂ
+jest.mock('./hooks/useFetchData', () => () => "dummy data");
+
+test('App', () => {
+    render(<App />);
+    screen.getByText('dummy data');
+});
+```
+
+위와 같이 작성을 해주면, App 컴포넌트를 렌더링 할 때 화면에 표시되는 HomePage 컴포넌트 내에서 사용되는 useFetchData() hook 함수가 호출되게 되는데, 위와 같이 임의로 useFetchData 함수에 대한 반환값을 임의로 지정할 수 있다.
+
+useFetchData() 함수를 통해 반환되는 값을 임의로 "dummy data"로 정의를 하였기 때문에, 
+실제로 App 컴포넌트를 렌더링 한 후에 화면에 보여지는 데이터를 검사하면, 임의의 값 "dummy data"가 출력되는 것을 확인할 수 있다.
+
+### src 디렉토리와 동일 레벨에 fixtures 디렉토리 생성
+
+기본적으로 프론트엔드 개발에서 사용되는 dummy 데이터의 경우에는 아래와 같이 fixtures/products.ts 파일을 만들어서 index.ts 파일을 통해 일괄적으로 export default 해주도록 한다.
+
+### hooks 디렉토리 하위에 `__mocks__` 디렉토리 생성
+__mocks__ 폴더를 만들어서 mocking할 대상 파일인 useFetchData.ts 파일을 붙여넣고, 아래와 같이 작성을 해준다.
+
+```ts
+const useFetchData = jest.fn(() => "dummyData");
+export default useFetchData;
+```
+
+위와 같이 임의의 __mocks__ 폴더를 만들어서 hook을 특정값을 반환하는 값과 함께 mocking을 해주게 되면, 아래와 같이 별도로 반환되는 값을 함수로써 정의하지 않아도 된다.
+```ts
+// (AS-IS)
+jest.mock('./hooks/useFetchData', () => () => fixtures.dummyData);
+
+// (TO-BE)
+jest.mock('./hooks/useFetchData');
+``` 
+
+위와 같이 jest.mock()을 사용해서 hook들을 mocking 해 줄 수 있다.
+
+useFetch() 자체를 mocking해서 url에 따라 어떤 응답을 해줄지에 대해서 처리를 해줄 수 있다.
+
+# MSW를 사용해서 백엔드와의 통신을 별도로 
 # (STEP 3) E2E 테스트 코드
 
