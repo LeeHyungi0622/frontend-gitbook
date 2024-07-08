@@ -927,6 +927,8 @@ jest.mock('./hooks/useFetchData');
 
 useFetch() 자체를 mocking해서 url에 따라 어떤 응답을 해줄지에 대해서 처리를 해줄 수 있다.
 
-# MSW를 사용해서 백엔드와의 통신을 별도로 
+# MSW
+MSW를 사용하면 백엔드와의 통신을 별도로 편리하게 프론트엔드 프로젝트 내부에서 처리해줄 수 있다.
+ 
 # (STEP 3) E2E 테스트 코드
 
