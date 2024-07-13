@@ -57,6 +57,11 @@
   - [React-Testing-Library](/Test/React-Testing-Library.md)
   - [Test-Code-Practice](/Test/TestCodePractice.md)
 
+## 디자인 시스템
+
+- [Design System](/Design_System/)
+  - [Intro](/Design_System/intro.md)
+
 ## 회고
 
 - [회고](/Review/)
@@ -65,3 +70,4 @@
   - [3주차 회고](/Review/3rd_week_review.md)
   - [6주차 회고](/Review/6th_week_review.md)
   - [7주차 회고](/Review/7th_week_review.md)
+  - [8주차 회고](/Review/8th_week_review.md)

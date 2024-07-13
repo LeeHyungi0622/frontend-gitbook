@@ -927,8 +927,108 @@ jest.mock('./hooks/useFetchData');
 
 useFetch() 자체를 mocking해서 url에 따라 어떤 응답을 해줄지에 대해서 처리를 해줄 수 있다.
 
-# MSW
+# MSW(Mock Service Worker)
 MSW를 사용하면 백엔드와의 통신을 별도로 편리하게 프론트엔드 프로젝트 내부에서 처리해줄 수 있다.
- 
+
+expressjs와 비슷하지만, 약간은 불편한 친구
+
+offline 모드인 경우에 최적화를 위해 사용될 수 있다.
+
+실제로 네트워크 레벨에서 proxy를 사용해서 가짜로 네트워크로의 요청을 처리한 것이다.
+
+원래는 오프라인 작업 등을 지원하기 위한 서비스 워커의 기능을 유용하게 사용한 것이다.
+
+`<참고자료>`
+
+[[참고1] MSW.js](https://v1.mswjs.io/)<br/>
+[[참고2] 서비스 워커 API](https://developer.mozilla.org/ko/docs/Web/API/Service_Worker_API)<br/>
+[[참고3] 대표의 Mock Service Worker](https://megaptera.notion.site/Mock-Service-Worker-MSW-4b95a309c11a46bd82fe4a478e3ce5d3)<br/>
+[[참고4] Mocking Rest API](https://v1.mswjs.io/docs/getting-started/mocks/rest-api)<br/>
+[[참고5] Integrate mocking into Node](https://v1.mswjs.io/docs/getting-started/integrate/node)<br/>
+
+## MSW 설치
+
+```zsh
+npm i -D msw
+```
+
+`(SETUP 1)` setupTests.ts 작성
+```ts
+import 'reflect-metadata';
+
+// eslint-disable-next-line import/no-extraneous-dependencies
+import 'whatwg-fetch';
+
+import server from './mocks/server';
+
+// test 하나 하나 실행될때마다 테스트 실행 전 실행
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+
+// jest test 하나 하나 끝날때마다
+afterAll(() => server.close());
+
+// 모든 jest 테스트가 끝날때마다
+afterEach(() => server.resetHandlers());
+```
+
+<br/>
+
+`(SETUP 2)` msw를 jest.config.js 파일에 설정추가
+
+설치를 한 뒤에 테스트는 jest를 사용해서 진행하기 때문에 `jest.config.js` 파일에 해당 MSW 서버 구동을 위한 처리를 
+작성해준다. (서버 기동 및 초기화 등)
+
+```js
+module.exports = {
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: [
+    '@testing-library/jest-dom/extend-expect',
+    // MSW 사용을 위한 서버 실행 처리(server.listen, server.close, server.resetHandlers() 처리를 위한 설정)
+    '<rootDir>/src/setupTests.ts',
+  ],
+  transform: {
+    '^.+\\.(t|j)sx?$': ['@swc/jest', {
+      jsc: {
+        parser: {
+          syntax: 'typescript',
+          jsx: true,
+          decorators: true,
+        },
+        transform: {
+          react: {
+            runtime: 'automatic',
+          },
+        },
+      },
+    }],
+  },
+  testPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/dist/',
+  ],
+};
+```
+
+<br/>
+
+`(SETUP 3)` jest는 브라우저가 아닌, node환경에서 동작을 하기 때문에 `msw/node`의 setupServer() method의 인자로
+정의한 handlers(API 유사)를 넘겨서 server 객체를 반환해준다.
+
+`setupServer()`를 사용하면 SSR(Server Side Rendering)과 테스트 코드 실행시에 사용될 수 있는 Mocking Service Worker를 사용할 수 있으며, `setupWorker()`를 사용하면 CSR(Client Side Rendering), 즉 웹 브라우저 상에서 네트워크를 통해 서버 사이드로 가는 요청을 네트워크 레벨에서 가로채서 처리를 할 수 있도록 도와준다.
+
+`server.ts`
+```ts
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { setupServer } from 'msw/node';
+
+import handlers from './handlers';
+
+const server = setupServer(...handlers);
+
+export default server;
+```
+
+
+
 # (STEP 3) E2E 테스트 코드
 
