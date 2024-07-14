@@ -212,3 +212,409 @@ npm i styled-components
 npm i -D @types/styled-components @swc/plugin-styled-components
 ```
 
+### VSCode styled-components Extension 설치하기
+
+`vscode-styled-components`
+
+### 기본으로 styled-components 사용하기
+
+```ts
+import styled from 'styled-components';
+
+const Paragraph = styled.p`
+  color: #00F;
+`;
+
+export default function Greeting() {
+  return (
+    <Paragraph>
+      Hello, world!
+    </Paragraph>
+  );
+}
+```
+
+<br/>
+
+### 이미지 정의 상속하기
+
+기존에 정의한 Paragraph 스타일 컴포넌트를 상속해서 BigParagraph를 정의할 수 있다.
+
+```ts
+import styled from 'styled-components';
+
+const Paragraph = styled.p`
+  color: #00F;
+`;
+
+const BigParagraph = styled(Paragraph)`
+  font-size: 5rem;
+`;
+
+export default function Greeting() {
+  return (
+    <BigParagraph>
+      Hello, world!
+    </BigParagraph>
+  );
+}
+```
+
+<br/>
+
+### 이미지 정의 Overwrite 하기 
+
+Paragraph를 상속한 BigParagraph는 Paragraph를 상속받아 color의 정의를 재정의 하고 있다.
+
+```ts
+import styled from 'styled-components';
+
+const Paragraph = styled.p`
+  color: #00F;
+`;
+
+const BigParagraph = styled(Paragraph)`
+  font-size: 5rem;
+  color: pink;
+`;
+
+export default function Greeting() {
+  return (
+    <BigParagraph>
+      Hello, world!
+    </BigParagraph>
+  );
+}
+```
+
+<br/>
+
+### 기존 컴포넌트에 스타일을 입히는 것도 가능하다. `단, 기존 컴포넌트가 class를 별도로 잡아줘야 가능하다.`
+
+```ts
+import styled from 'styled-components';
+
+function HelloWorld({ className }: React.HTMLAttributes<HTMLElement>) {
+  return (
+    <p className={className}>
+      Hello, world!
+    </p>
+  );
+}
+
+const Greeting = styled(HelloWorld)`
+  color: #00F;
+`;
+
+export default Greeting;
+```
+
+<br/>
+
+## Props를 활용해서 styled-components 사용하기
+
+Props는 활성화 여부를 표현하거나, 특정 스타일을 잡아주고 싶을 때 유용하다.
+
+```ts
+import { useBoolean } from 'usehooks-ts';
+import styled, { css } from 'styled-components';
+
+type ParagraphProps = {
+    active?: boolean;
+}
+
+const Paragraph = styled.p<ParagraphProps>`
+    color: ${(props) => (props.active ? '#F00' : '#888')};
+    ${(props) => props.active && css`
+        font-weight: bold;
+    `
+    }
+`;
+
+export default function Greeting() {
+
+    const { value: active, toggle } = useBoolean(false);
+
+    return (
+        <div>
+            <Paragraph>
+                Inactive
+            </Paragraph>
+            <Paragraph active>
+                Active
+            </Paragraph>
+            <Paragraph active={active}>
+                Hello, world
+                {' '}
+            </Paragraph>
+            <button type="button" onClick={toggle}>
+                Toggle
+            </button>
+        </div>
+    )
+}
+```
+
+<br/>
+
+## 속성을 기준으로 반복 스타일 속성 처리
+
+기본 속성을 추가함으로써 불필요하게 반복되는 속성을 처리할 때 유용하며, 버튼 등을 만들 때 적극 활용된다.
+
+```ts
+import styled from "styled-components";
+
+const ButtonStyle = styled.button.attrs({
+    type: 'button'
+})`
+    border: 1px solid #888;
+    background: transparent;
+    cursor: pointer;
+`;
+
+export default ButtonStyle;
+```
+
+<br/>
+
+## 전체 적용되는 스타일
+
+Reset Css를 styled component로 사용하기 위한 `styled-reset`가 있다.
+
+[(참고) Reset Css](https://meyerweb.com/eric/tools/css/reset/)
+
+[(참고) styled-reset](https://github.com/zacanger/styled-reset)
+
+```zsh
+npm i styled-reset
+```
+
+App 컴포넌트에 Reset Css style 적용하기
+
+```ts
+import { Reset } from 'styled-reset';
+
+export default function App() {
+    return (
+        <>
+            <Reset />
+            <Greeting />
+        </>
+    )
+}
+```
+
+### border-box 스타일 적용하기
+
+
+### <u>font size를 62.5% 적용하기</u>
+
+(디자이너랑 협업시에 rem 단위로 하면 협업에 어려움이 있다. 따라서 아래와 같이 기본 텍스트 사이즈 크기를 잡고 작업을 하면 좋다)
+
+62.5%를 잡으면 10px이 기본 텍스트 폰트 사이즈가 되고, body 태그 내부 스타일 정의에서 font-size를 1.6rem으로 하면, body영역의 텍스트 사이즈가 16px이 된다.
+```css
+html {
+    font-size:  62.5%;
+}
+
+body {
+    font-size: 1.6rem;
+}
+```
+
+### 글자가 아래로 떨어지는 (line feed)현상을 막기
+
+```css
+:lang(ko) {
+    h1, h2, h3 {
+        word-break: keep-all;
+    }
+}
+```
+
+<br/>
+
+위에서 정의한 box-sizing, font-size, word-break 스타일의 경우에는 아래와 같이 GlobalStyle로 생성을 해서 적용을 해준다.
+
+[(참고) createGlobalStyle](https://styled-components.com/docs/api#createglobalstyle)
+
+[(참고) 박스모델](https://developer.mozilla.org/ko/docs/Learn/CSS/Building_blocks/The_box_model#%EB%8C%80%EC%B2%B4_css_box_model)
+
+[(참고) box-sizing](https://developer.mozilla.org/ko/docs/Web/CSS/box-sizing)
+
+[(참고) 62.5% font size trick](https://www.aleksandrhovhannisyan.com/blog/62-5-percent-font-size-trick/)
+
+[(참고) keep-all-villain](https://megaptera.notion.site/keep-all-villain-923a4b6f23eb45b99aef4d8bc0865f9c)
+
+[(참고) word-break](https://developer.mozilla.org/ko/docs/Web/CSS/word-break)
+
+```ts
+import { createGlobalStyle } from 'styled-components';
+
+const GlobalStyle = createGlobalStyle`
+  html {
+    box-sizing: border-box;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
+  }
+
+  html {
+    font-size: 62.5%;
+  }
+
+  body {
+    font-size: 1.6rem;
+  }
+
+  :lang(ko) {
+    h1, h2, h3 {
+      word-break: keep-all;
+    }
+  }
+`;
+
+export default GlobalStyle;
+```
+
+GlobalStyle을 `<App/>`에 적용해주기
+
+```ts
+import { Reset } from 'styled-reset';
+
+import GlobalStyle from './styles/GlobalStyle';
+
+export default function App() {
+  return (
+    <>
+      <Reset />
+      <GlobalStyle />
+      <Greeting />
+    </>
+  );
+}
+```
+
+<br/>
+
+## Theme
+
+테마 적용하는 방법
+
+[(참고) Theming](https://styled-components.com/docs/advanced#theming)
+
+[(참고) Create a declarations file]()
+
+Theme provider를 사용해서 기본적으로 props.theme 속성을 하위 컴포넌트들에 넘겨줌으로써 Theme에 따른 스타일 속성을 적용해줄 수 있다.
+
+디자인 시스템의 근간을 마련해서 활용하도록 한다. 잘 정의하면 다크 모드 등에 대응하기가 쉽고, 눈에 보이는 단편적인 정보를 넘어서 "의미"에 집중할 수 있게 된다.
+
+### Theme 정의
+
+가장 근간이 되는 기본 스타일에 대해서 정의한다.
+
+```ts
+const defaultTheme = {
+  colors: {
+    background: '#FFF',
+    text: '#000',
+    primary: '#F00',
+    secondary: '#00F',
+  },
+};
+
+export default defaultTheme;
+```
+
+### darkTheme 정의하기
+
+ defaultTheme과 darkTheme은 타입을 잡아서 같은 타입으로 타이트하게 잡아서 개발을 해주는 것이 좋다.
+
+ ```ts
+ import defaultTheme from "../defaultTheme";
+
+ type Theme = typeof defaultTheme;
+
+ export default Theme;
+ ```
+
+### darkTheme에 타입 지정해주기
+
+```ts
+import Theme from "./types/Theme";
+
+const darkTheme: Theme = {
+    colors: {
+        background: '#FFF',
+        text: '#000',
+        primary: '#F00',
+        secondary: '#00F',
+    },
+};
+
+export default darkTheme;
+```
+
+### 상위 컴포넌트에서 ThemeProvider를 통해 default Theme 적용하기
+
+```ts
+import 'reflect-metadata';
+
+import ReactDOM from 'react-dom/client';
+
+import { Reset } from 'styled-reset';
+
+import App from './App';
+import { BrowserRouter } from 'react-router-dom';
+import React from 'react';
+import GlobalStyle from './styles/GlobalStyle';
+import defaultTheme from './styles/defaultTheme';
+import { ThemeProvider } from 'styled-components';
+
+function main() {
+  const container = document.getElementById('root');
+  if (!container) {
+    return;
+  }
+
+  const theme = defaultTheme;
+
+  const root = ReactDOM.createRoot(container);
+  root.render(
+    <React.StrictMode>
+      <GlobalStyle />
+      <Reset />
+      {/* <BrowserRouter> */}
+      <ThemeProvider theme={theme}>
+        <App />
+      </ThemeProvider>
+      {/* </BrowserRouter> */}
+    </React.StrictMode>
+  );
+}
+
+main();
+```
+
+이제 아래와 같이 GlobalStyles.ts에서 정의한 theme 내의 colors 정보를 가져다가 사용할 수 있다.
+
+단, 개발할때 자동완성이 안되는 경우가 있는데, 이 경우에는 아래와 같이 *.d.ts 파일을 작성해서 해결해주도록 하자.
+
+`styled.d.ts`
+
+```ts
+import 'styled-components';
+import Theme from './types/Theme';
+
+declare module 'styled-components' {
+    export interface DefaultTheme extends Theme{
+       // Theme을 상속받았기 때문에 별도로 쓰지 않아도 된다.
+    }
+}
+```
+
+### usehooks-ts의 useDarkMode를 사용해서 Theme을 적용
+
