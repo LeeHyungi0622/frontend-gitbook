@@ -618,3 +618,26 @@ declare module 'styled-components' {
 
 ### usehooks-ts의 useDarkMode를 사용해서 Theme을 적용
 
+### 아래와 같이 Design guide에 정의된 공통 스타일 내용들을 추가로 작성해준다.
+
+```ts
+
+const defaultTheme = {
+    fonts: {
+        normal: '',
+        headline: '',
+    },
+    size: {
+        normal: '',
+        headline: '',
+    },
+    colors: {
+        background: '#888',
+        text: '#000',
+        primary: '#F00',
+        secondary: '#00F',
+    },
+};
+
+export default defaultTheme;
+```
